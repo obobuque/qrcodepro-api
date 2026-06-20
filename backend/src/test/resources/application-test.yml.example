@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/qrpro_test
+    username: qrpro
+    password: YOUR_DB_PASSWORD
+    driver-class-name: org.postgresql.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+  jpa:
+    show-sql: false
+  flyway:
+    enabled: true
+
+minio:
+  endpoint: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: qrcodes-test
+  secure: false
+
+jwt:
+  secret: YOUR_JWT_SECRET_MIN_64_CHARS
+  expiration: 86400000
+
+qr:
+  default-size: 300
+  max-size: 2000
+  default-correction-level: M
+  base-url: http://localhost/r/
+
+logging:
+  level:
+    com.qrpro: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN

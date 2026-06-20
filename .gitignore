@@ -1,0 +1,23 @@
+# Maven
+backend/target/
+backend/*.log
+
+# Storage local (imagens geradas em dev)
+backend/qr-storage/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# Secrets e configs locais
+backend/src/main/resources/application-dev.yml
+backend/src/test/resources/application-test.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.env
