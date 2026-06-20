@@ -27,6 +27,9 @@ public class S3StorageAdapter implements QrCodeStoragePort {
     @Value("${minio.bucket}")
     private String bucket;
 
+    @Value("${minio.public-url}")
+    private String publicUrl;
+
     @Override
     public String store(byte[] imageData, String fileName) {
         try {
@@ -38,39 +41,27 @@ public class S3StorageAdapter implements QrCodeStoragePort {
                     .contentType("image/png")
                     .build()
             );
-
-            String url = minioClient.getPresignedObjectUrl(
-                io.minio.GetPresignedObjectUrlArgs.builder()
-                    .method(io.minio.http.Method.GET)
-                    .bucket(bucket)
-                    .object(fileName)
-                    .build()
-            );
-
-            log.debug("Stored QR code image in S3: {}", fileName);
+            String url = publicUrl + "/" + fileName;
+            log.debug("Stored QR code image in R2: {}", url);
             return url;
-
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-            log.error("Failed to store QR code in S3", e);
-            throw new RuntimeException("Failed to store image in S3", e);
+            log.error("Failed to store QR code in R2", e);
+            throw new RuntimeException("Failed to store image in R2", e);
         }
     }
 
     @Override
     public InputStream retrieve(String fileName) {
-        // Implementar se necessário
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public void delete(String fileName) {
-        // Implementar se necessário
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public boolean exists(String fileName) {
-        // Implementar se necessário
         throw new UnsupportedOperationException("Not implemented");
     }
 }
