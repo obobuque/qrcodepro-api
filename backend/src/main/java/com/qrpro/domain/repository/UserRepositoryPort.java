@@ -11,4 +11,6 @@ public interface UserRepositoryPort {
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
     java.util.Optional<User> findById(java.util.UUID id);
+    java.util.Optional<User> findByApiKey(String apiKey);
+    User updateApiKey(java.util.UUID userId, String apiKey);
 }

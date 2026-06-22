@@ -21,7 +21,7 @@ class UserRepositoryAdapterIT extends AbstractIntegrationTest {
     private User newUser() {
         String id = UUID.randomUUID().toString().substring(0, 8);
         return new User(UUID.randomUUID(), "user_" + id,
-                "user_" + id + "@email.com", "$2a$bcrypt", true, null);
+                "user_" + id + "@email.com", "$2a$bcrypt", true, null, null);
     }
 
     @Test

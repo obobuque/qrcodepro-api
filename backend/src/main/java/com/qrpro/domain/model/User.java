@@ -9,5 +9,6 @@ public record User(
     String email,
     String password,
     boolean active,
-    OffsetDateTime createdAt
+    OffsetDateTime createdAt,
+    String apiKey
 ) {}

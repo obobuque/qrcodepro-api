@@ -35,14 +35,12 @@ public class QrCodeController {
     private final QrCodeService qrCodeService;
     private final QrCodeMapper qrCodeMapper;
 
-    // ── CREATE ──────────────────────────────────────────────────────────────
-
     @PostMapping("/static")
     @Operation(summary = "Criar QR Code estático")
     public ResponseEntity<QrCodeResponse> generateStatic(
             @Valid @RequestBody GenerateStaticQrRequest request) {
         var command = new GenerateQrCodeUseCase.StaticQrCommand(
-                request.ownerId(), request.content(), request.design());
+                currentUserId().toString(), request.content(), request.design());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(qrCodeMapper.toResponse(generateQrCodeUseCase.generateStatic(command)));
     }
@@ -52,18 +50,15 @@ public class QrCodeController {
     public ResponseEntity<QrCodeResponse> generateDynamic(
             @Valid @RequestBody GenerateDynamicQrRequest request) {
         var command = new GenerateQrCodeUseCase.DynamicQrCommand(
-                request.ownerId(), request.initialUrl(), request.design());
+                currentUserId().toString(), request.initialUrl(), request.design());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(qrCodeMapper.toResponse(generateQrCodeUseCase.generateDynamic(command)));
     }
 
-    // ── READ ─────────────────────────────────────────────────────────────────
-
     @GetMapping
     @Operation(summary = "Listar meus QR Codes")
     public ResponseEntity<List<QrCodeResponse>> listMine() {
-        UUID ownerId = currentUserId();
-        List<QrCodeResponse> result = qrCodeService.listByOwner(ownerId)
+        List<QrCodeResponse> result = qrCodeService.listByOwner(currentUserId())
                 .stream().map(qrCodeMapper::toResponse).toList();
         return ResponseEntity.ok(result);
     }
@@ -88,13 +83,9 @@ public class QrCodeController {
     @Operation(summary = "Histórico de scans do QR Code")
     public ResponseEntity<List<ScanEventResponse>> getScans(@PathVariable UUID id) {
         List<ScanEventResponse> scans = qrCodeService.getScanHistory(id)
-                .stream()
-                .map(this::toScanResponse)
-                .toList();
+                .stream().map(this::toScanResponse).toList();
         return ResponseEntity.ok(scans);
     }
-
-    // ── UPDATE ───────────────────────────────────────────────────────────────
 
     @PutMapping("/{id}/destination")
     @Operation(summary = "Atualizar destino do QR Code dinâmico")
@@ -118,16 +109,12 @@ public class QrCodeController {
         return ResponseEntity.ok(qrCodeMapper.toResponse(qrCodeService.activate(id)));
     }
 
-    // ── DELETE ───────────────────────────────────────────────────────────────
-
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar QR Code")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         qrCodeService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
-    // ── HELPERS ──────────────────────────────────────────────────────────────
 
     private UUID currentUserId() {
         return UUID.fromString(
@@ -136,7 +123,7 @@ public class QrCodeController {
 
     private ScanEventResponse toScanResponse(ScanEvent e) {
         return new ScanEventResponse(
-                e.getId(), e.getShortCode() != null ? e.getShortCode().value() : null, e.getIpAddress(),
-                e.getUserAgent(), e.getReferer(), e.getScannedAt());
+                e.getId(), e.getShortCode() != null ? e.getShortCode().value() : null,
+                e.getIpAddress(), e.getUserAgent(), e.getReferer(), e.getScannedAt());
     }
 }

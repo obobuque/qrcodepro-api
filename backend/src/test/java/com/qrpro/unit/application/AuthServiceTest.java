@@ -50,7 +50,7 @@ class AuthServiceTest {
         when(userRepositoryPort.existsByUsername(USERNAME)).thenReturn(false);
         when(userRepositoryPort.save(any(User.class))).thenAnswer(inv -> {
             User u = inv.getArgument(0);
-            return new User(u.id(), u.username(), u.email(), u.password(), u.active(), null);
+            return new User(u.id(), u.username(), u.email(), u.password(), u.active(), null, null);
         });
 
         String token = authService.register(USERNAME, EMAIL, PASSWORD);
@@ -85,31 +85,33 @@ class AuthServiceTest {
 
     @Test
     void login_should_return_token_for_valid_credentials() {
-        User stored = new User(UUID.randomUUID(), USERNAME, EMAIL, ENCODED, true, null);
-        when(userRepositoryPort.findByEmail(EMAIL)).thenReturn(Optional.of(stored));
+        User stored = new User(UUID.randomUUID(), USERNAME, EMAIL, ENCODED, true, null, null);
+        when(userRepositoryPort.findByUsername(USERNAME)).thenReturn(Optional.of(stored));
         when(passwordEncoder.matches(PASSWORD, ENCODED)).thenReturn(true);
 
-        String token = authService.login(EMAIL, PASSWORD);
+        AuthService.LoginResult result = authService.login(USERNAME, PASSWORD);
 
-        assertThat(token).isEqualTo(TOKEN);
+        assertThat(result.token()).isEqualTo(TOKEN);
+        assertThat(result.username()).isEqualTo(USERNAME);
+        assertThat(result.email()).isEqualTo(EMAIL);
     }
 
     @Test
     void login_should_throw_when_user_not_found() {
-        when(userRepositoryPort.findByEmail(EMAIL)).thenReturn(Optional.empty());
+        when(userRepositoryPort.findByUsername(USERNAME)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> authService.login(EMAIL, PASSWORD))
+        assertThatThrownBy(() -> authService.login(USERNAME, PASSWORD))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("User not found");
     }
 
     @Test
     void login_should_throw_for_wrong_password() {
-        User stored = new User(UUID.randomUUID(), USERNAME, EMAIL, ENCODED, true, null);
-        when(userRepositoryPort.findByEmail(EMAIL)).thenReturn(Optional.of(stored));
+        User stored = new User(UUID.randomUUID(), USERNAME, EMAIL, ENCODED, true, null, null);
+        when(userRepositoryPort.findByUsername(USERNAME)).thenReturn(Optional.of(stored));
         when(passwordEncoder.matches(PASSWORD, ENCODED)).thenReturn(false);
 
-        assertThatThrownBy(() -> authService.login(EMAIL, PASSWORD))
+        assertThatThrownBy(() -> authService.login(USERNAME, PASSWORD))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Invalid password");
     }

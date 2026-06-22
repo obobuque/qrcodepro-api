@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: qrpro-api
+    runtime: java
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -Dspring.profiles.active=prod -jar target/qrpro-api-1.0.0.jar
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: qrpro-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: qrpro-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: qrpro-db
+          property: password
+      - key: SPRING_DATA_REDIS_HOST
+        sync: false
+      - key: SPRING_DATA_REDIS_PORT
+        value: "6379"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: "86400000"
+      - key: QR_BASE_URL
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        value: "9fbb9c3053c0efb523aad765cff23131"
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_PUBLIC_URL
+        value: "https://pub-0155d77db3504afe9926b532eae8b2c0.r2.dev"
+
+databases:
+  - name: qrpro-db
+    databaseName: qrpro
+    user: qrpro

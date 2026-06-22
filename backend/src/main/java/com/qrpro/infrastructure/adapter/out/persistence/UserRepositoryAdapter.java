@@ -26,6 +26,16 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public Optional<User> findById(UUID id) {
+        return userRepository.findById(id).map(this::toDomain);
+    }
+
+    @Override
+    public Optional<User> findByApiKey(String apiKey) {
+        return userRepository.findByApiKey(apiKey).map(this::toDomain);
+    }
+
+    @Override
     public User save(User user) {
         UserEntity entity = UserEntity.builder()
                 .id(user.id())
@@ -33,13 +43,17 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 .email(user.email())
                 .password(user.password())
                 .active(user.active())
+                .apiKey(user.apiKey())
                 .build();
         return toDomain(userRepository.save(entity));
     }
 
     @Override
-    public java.util.Optional<com.qrpro.domain.model.User> findById(java.util.UUID id) {
-        return userRepository.findById(id).map(this::toDomain);
+    public User updateApiKey(UUID userId, String apiKey) {
+        UserEntity entity = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        entity.setApiKey(apiKey);
+        return toDomain(userRepository.save(entity));
     }
 
     @Override
@@ -59,7 +73,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 entity.getEmail(),
                 entity.getPassword(),
                 entity.isActive(),
-                entity.getCreatedAt()
+                entity.getCreatedAt(),
+                entity.getApiKey()
         );
     }
 }

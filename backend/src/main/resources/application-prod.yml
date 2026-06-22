@@ -31,13 +31,12 @@ server:
   compression:
     enabled: true
 
-minio:
-  endpoint: ${MINIO_ENDPOINT}
-  access-key: ${MINIO_ACCESS_KEY}
-  secret-key: ${MINIO_SECRET_KEY}
-  bucket: ${MINIO_BUCKET:qrcodes}
-  public-url: ${MINIO_PUBLIC_URL}
-  secure: true
+r2:
+  access-key-id: ${R2_ACCESS_KEY_ID}
+  secret-access-key: ${R2_SECRET_ACCESS_KEY}
+  endpoint: https://0a0aef52d81c40637c43447fa3c6d4f8.r2.cloudflarestorage.com
+  bucket-name: qrcodepro
+  public-url: ${R2_PUBLIC_URL}
 
 jwt:
   secret: ${JWT_SECRET}

@@ -1,5 +1,6 @@
 package com.qrpro.infrastructure.config;
 
+import com.qrpro.infrastructure.security.ApiKeyAuthenticationFilter;
 import com.qrpro.infrastructure.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,11 +40,10 @@ public class SecurityConfig {
                     "/swagger-ui.html",
                     "/webjars/**"
                 ).permitAll()
-                .requestMatchers("/api/v1/qr/**").authenticated()
                 .anyRequest().authenticated()
             )
+            .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 }

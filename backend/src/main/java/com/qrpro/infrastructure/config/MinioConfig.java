@@ -1,29 +1,30 @@
 package com.qrpro.infrastructure.config;
 
-import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import java.net.URI;
 
 @Configuration
 @Profile("prod")
 public class MinioConfig {
 
-    @Value("${minio.endpoint}")
-    private String endpoint;
-
-    @Value("${minio.access-key}")
-    private String accessKey;
-
-    @Value("${minio.secret-key}")
-    private String secretKey;
-
     @Bean
-    public MinioClient minioClient() {
-        return MinioClient.builder()
-                .endpoint(endpoint)
-                .credentials(accessKey, secretKey)
+    public S3Client r2Client(
+            @Value("${r2.access-key-id}") String accessKeyId,
+            @Value("${r2.secret-access-key}") String secretAccessKey,
+            @Value("${r2.endpoint}") String endpoint) {
+        return S3Client.builder()
+                .endpointOverride(URI.create(endpoint))
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(accessKeyId, secretAccessKey)))
+                .region(Region.of("auto"))
+                .forcePathStyle(true)
                 .build();
     }
 }

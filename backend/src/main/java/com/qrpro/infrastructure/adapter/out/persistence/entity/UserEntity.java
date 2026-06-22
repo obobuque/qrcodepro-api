@@ -34,6 +34,9 @@ public class UserEntity {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(name = "api_key", unique = true, length = 64)
+    private String apiKey;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
