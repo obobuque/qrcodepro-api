@@ -23,7 +23,7 @@ public class MinioConfig {
                 .endpointOverride(URI.create(endpoint))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(accessKeyId, secretAccessKey)))
-                .region(Region.of("auto"))
+                .region(Region.US_EAST_1)
                 .forcePathStyle(true)
                 .build();
     }
