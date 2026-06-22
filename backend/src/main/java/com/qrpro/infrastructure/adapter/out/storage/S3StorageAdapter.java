@@ -1,27 +1,25 @@
 package com.qrpro.infrastructure.adapter.out.storage;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.qrpro.application.port.out.QrCodeStoragePort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3Configuration;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.net.URI;
 
 @Slf4j
 @Component
 @Profile("prod")
 public class S3StorageAdapter implements QrCodeStoragePort {
 
-    private final S3Client s3Client;
+    private final AmazonS3 s3Client;
     private final String bucket;
     private final String publicUrl;
 
@@ -33,28 +31,23 @@ public class S3StorageAdapter implements QrCodeStoragePort {
             @Value("${r2.public-url}") String publicUrl) {
         this.bucket = bucket;
         this.publicUrl = publicUrl;
-        this.s3Client = S3Client.builder()
-                .endpointOverride(URI.create(endpoint))
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKeyId, secretAccessKey)))
-                .region(Region.of("auto"))
-                .serviceConfiguration(S3Configuration.builder()
-                        .pathStyleAccessEnabled(true)
-                        .chunkedEncodingEnabled(false)
-                        .build())
+        this.s3Client = AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration(
+                    new AwsClientBuilder.EndpointConfiguration(endpoint, "auto"))
+                .withCredentials(new AWSStaticCredentialsProvider(
+                    new BasicAWSCredentials(accessKeyId, secretAccessKey)))
+                .withPathStyleAccessEnabled(true)
                 .build();
-        log.info("R2 storage inicializado: bucket={}, accessKeyId_prefix={}", bucket, accessKeyId.substring(0, Math.min(4, accessKeyId.length())));
+        log.info("R2 storage inicializado (SDK v1): bucket={}, prefix={}", bucket,
+                accessKeyId.substring(0, Math.min(4, accessKeyId.length())));
     }
 
     @Override
     public String store(byte[] imageData, String fileName) {
-        s3Client.putObject(
-                b -> b.bucket(bucket)
-                      .key(fileName)
-                      .contentType("image/png")
-                      .contentLength((long) imageData.length),
-                RequestBody.fromBytes(imageData)
-        );
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType("image/png");
+        metadata.setContentLength(imageData.length);
+        s3Client.putObject(bucket, fileName, new ByteArrayInputStream(imageData), metadata);
         String url = publicUrl + "/" + fileName;
         log.info("QR salvo no R2: {}", url);
         return url;
@@ -62,23 +55,17 @@ public class S3StorageAdapter implements QrCodeStoragePort {
 
     @Override
     public InputStream retrieve(String fileName) {
-        return s3Client.getObject(b -> b.bucket(bucket).key(fileName));
+        return s3Client.getObject(bucket, fileName).getObjectContent();
     }
 
     @Override
     public void delete(String fileName) {
-        s3Client.deleteObject(b -> b.bucket(bucket).key(fileName));
+        s3Client.deleteObject(bucket, fileName);
         log.info("QR deletado do R2: {}", fileName);
     }
 
     @Override
     public boolean exists(String fileName) {
-        try {
-            s3Client.headObject(HeadObjectRequest.builder()
-                    .bucket(bucket).key(fileName).build());
-            return true;
-        } catch (NoSuchKeyException e) {
-            return false;
-        }
+        return s3Client.doesObjectExist(bucket, fileName);
     }
 }
