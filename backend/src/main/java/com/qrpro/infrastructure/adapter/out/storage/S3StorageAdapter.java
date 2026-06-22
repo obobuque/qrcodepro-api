@@ -43,7 +43,7 @@ public class S3StorageAdapter implements QrCodeStoragePort {
                         .chunkedEncodingEnabled(false)
                         .build())
                 .build();
-        log.info("R2 storage inicializado: bucket={}", bucket);
+        log.info("R2 storage inicializado: bucket={}, accessKeyId_prefix={}", bucket, accessKeyId.substring(0, Math.min(4, accessKeyId.length())));
     }
 
     @Override
