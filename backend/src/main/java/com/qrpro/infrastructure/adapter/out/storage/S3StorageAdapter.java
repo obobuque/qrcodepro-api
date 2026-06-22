@@ -10,6 +10,7 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import java.io.InputStream;
@@ -36,9 +37,12 @@ public class S3StorageAdapter implements QrCodeStoragePort {
                 .endpointOverride(URI.create(endpoint))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(accessKeyId, secretAccessKey)))
-                .region(Region.US_EAST_1)
-                .forcePathStyle(true)
+                .region(Region.of("auto"))
+                .serviceConfiguration(S3Configuration.builder()
+                        .pathStyleAccessEnabled(true)
+                        .build())
                 .build();
+        log.info("R2 storage inicializado: bucket={}, endpoint={}", bucket, endpoint);
     }
 
     @Override
