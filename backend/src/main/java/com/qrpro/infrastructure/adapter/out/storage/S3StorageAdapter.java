@@ -40,15 +40,19 @@ public class S3StorageAdapter implements QrCodeStoragePort {
                 .region(Region.of("auto"))
                 .serviceConfiguration(S3Configuration.builder()
                         .pathStyleAccessEnabled(true)
+                        .chunkedEncodingEnabled(false)
                         .build())
                 .build();
-        log.info("R2 storage inicializado: bucket={}, endpoint={}", bucket, endpoint);
+        log.info("R2 storage inicializado: bucket={}", bucket);
     }
 
     @Override
     public String store(byte[] imageData, String fileName) {
         s3Client.putObject(
-                b -> b.bucket(bucket).key(fileName).contentType("image/png"),
+                b -> b.bucket(bucket)
+                      .key(fileName)
+                      .contentType("image/png")
+                      .contentLength((long) imageData.length),
                 RequestBody.fromBytes(imageData)
         );
         String url = publicUrl + "/" + fileName;
