@@ -54,8 +54,8 @@ management:
 
 logging:
   level:
-    com.qrpro: WARN
-    org.springframework.security: WARN
+    com.qrpro: DEBUG
+    org.springframework: INFO
     org.hibernate: WARN
 
 server:
