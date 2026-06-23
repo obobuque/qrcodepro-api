@@ -30,7 +30,7 @@ public class ProcessScanService implements ProcessScanUseCase {
 
             String cachedUrl = cachePort.getDestination(shortCode);
             if (cachedUrl != null) {
-                fireTrackingEvent(shortCode, metadata);
+                fireTrackingEvent(shortCode, qrCode.getId(), metadata);
                 return new ScanResult(cachedUrl, true);
             }
 
@@ -59,7 +59,7 @@ public class ProcessScanService implements ProcessScanUseCase {
             }
 
             cachePort.cacheDestination(shortCode, targetUrl);
-            fireTrackingEvent(shortCode, metadata);
+            fireTrackingEvent(shortCode, qrCode.getId(), metadata);
 
             return new ScanResult(targetUrl, true);
 
@@ -69,10 +69,10 @@ public class ProcessScanService implements ProcessScanUseCase {
         }
     }
 
-    private void fireTrackingEvent(ShortCode shortCode, ScanMetadata metadata) {
+    private void fireTrackingEvent(ShortCode shortCode, UUID qrCodeId, ScanMetadata metadata) {
         try {
             var event = ScanEvent.create(
-                UUID.randomUUID(),
+                qrCodeId,
                 shortCode,
                 metadata.ipAddress(),
                 metadata.userAgent(),
