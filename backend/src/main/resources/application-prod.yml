@@ -54,13 +54,10 @@ management:
 
 logging:
   level:
-    com.qrpro: DEBUG
-    org.springframework: INFO
+    com.qrpro: INFO
+    org.springframework.security: WARN
     org.hibernate: WARN
 
 server:
   port: ${PORT:8080}
-  error:
-    include-stacktrace: always
-    include-message: always
   shutdown: graceful

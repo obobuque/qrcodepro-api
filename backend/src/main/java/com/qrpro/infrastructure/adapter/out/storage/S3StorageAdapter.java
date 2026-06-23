@@ -38,8 +38,7 @@ public class S3StorageAdapter implements QrCodeStoragePort {
                     new BasicAWSCredentials(accessKeyId, secretAccessKey)))
                 .withPathStyleAccessEnabled(true)
                 .build();
-        log.info("R2 storage inicializado (SDK v1): bucket={}, prefix={}", bucket,
-                accessKeyId.substring(0, Math.min(4, accessKeyId.length())));
+        log.info("R2 storage inicializado: bucket={}", bucket);
     }
 
     @Override
