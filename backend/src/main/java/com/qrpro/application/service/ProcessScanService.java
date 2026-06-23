@@ -30,7 +30,9 @@ public class ProcessScanService implements ProcessScanUseCase {
 
             String cachedUrl = cachePort.getDestination(shortCode);
             if (cachedUrl != null) {
-                fireTrackingEvent(shortCode, qrCode.getId(), metadata);
+                UUID cachedQrId = qrCodeRepository.findByShortCode(shortCode)
+                    .map(qr -> qr.getId()).orElse(null);
+                fireTrackingEvent(shortCode, cachedQrId, metadata);
                 return new ScanResult(cachedUrl, true);
             }
 
