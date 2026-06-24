@@ -1,80 +1,140 @@
-# Contribuindo com QR Pro API
+# Guia de Contribuição — QR Pro API
 
-Obrigado pelo interesse em contribuir!
+Obrigado pelo interesse em contribuir! 🎉
 
-## Como contribuir
+---
 
-### 1. Reportando bugs
+## 🚀 Como Contribuir
 
-- Verifique se o bug ja foi reportado nas Issues
-- Inclua passos para reproduzir, comportamento esperado vs atual, e logs se houver
-- Use o label bug
+### 1. Reportar Bugs
 
-### 2. Sugerindo features
+Use o template [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md). Inclua:
+- Passos para reproduzir
+- Comportamento esperado vs atual
+- Logs e stack traces
+- Ambiente (Java version, SO, etc.)
 
-- Abra uma Issue com o label enhancement
-- Descreva o problema que a feature resolve e como voce imagina a solucao
+### 2. Sugerir Features
 
-### 3. Enviando codigo
+Use o template [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md). Descreva:
+- O problema que a feature resolve
+- Solução proposta
+- Alternativas consideradas
 
-1. Fork o repositorio
-2. Clone seu fork: git clone https://github.com/SEU_USER/qrcodepro-api.git
-3. Crie uma branch: git checkout -b feature/minha-feature
-4. Faca as alteracoes seguindo os padroes abaixo
-5. Teste: ./mvnw test (todos os 33+ testes devem passar)
-6. Commit: git commit -m "feat: descricao clara"
-7. Push: git push origin feature/minha-feature
-8. Abra um Pull Request
+### 3. Enviar Pull Requests
 
-## Padroes de codigo
-
-### Commits (Conventional Commits)
-
-- feat: nova feature
-- fix: correcao de bug
-- docs: documentacao
-- style: formatacao (sem mudanca de codigo)
-- refactor: refatoracao
-- test: adicionar/corrigir testes
-- chore: build, dependencias, etc.
-
-### Arquitetura
-
-- Domain nao depende de nenhuma outra camada
-- Application depende apenas de Domain
-- Infrastructure depende de Domain e Application
-- Use Ports & Adapters (interfaces no domain/application, implementacoes no infrastructure)
-- Testes unitarios com Mockito, integracao com banco real
-
-### Checklist antes de commitar
-
-- [ ] ./mvnw test passa (33+ testes)
-- [ ] ./mvnw verify passa (inclui ArchUnit)
-- [ ] Codigo segue o padrao do projeto
-- [ ] Novos endpoints documentados no OpenAPI
-- [ ] Migrations Flyway criadas se necessario
-
-## Ambiente de desenvolvimento
-
+#### Setup
 ```bash
-# 1. Clone
 git clone https://github.com/obobuque/qrcodepro-api.git
 cd qrcodepro-api
-
-# 2. Dependencias
-docker-compose up -d
-
-# 3. Configure
-cp .env.example .env
-# Edite .env
-
-# 4. Rode
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
-
-# 5. Teste
-./mvnw test
 ```
 
-## Duvidas?
+#### Branch naming
+```
+feature/qr-com-logo
+fix/rate-limit-planos
+docs/atualizar-readme
+refactor/melhorar-cache
+```
 
-Abra uma Issue ou entre em contato: gblgabriel111@gmail.com
+#### Antes de commitar
+```bash
+./mvnw clean compile
+./mvnw verify
+./mvnw test -Dtest=ArchitectureTest
+```
+
+#### Regras de código
+- **Java 21** com Virtual Threads quando aplicável
+- **Arquitetura Hexagonal** — nunca importe infrastructure em domain
+- **Testes obrigatórios** para novas features
+- **Flyway migrations** para alterações de schema
+- **DTOs** para entrada/saída de controllers
+- **Ports & Adapters** para novas integrações externas
+
+#### Commit messages (Conventional Commits)
+```
+feat: adicionar QR com logo
+fix: corrigir rate limit para planos dinâmicos
+docs: atualizar README com novos endpoints
+refactor: migrar storage para R2 SDK v2
+test: adicionar testes para SubscriptionService
+```
+
+#### PR Checklist
+- [ ] Código compila sem warnings
+- [ ] Todos os testes passam (`./mvnw verify`)
+- [ ] ArchUnit não quebra
+- [ ] Flyway migrations testadas
+- [ ] Documentação atualizada (README, API.md, etc.)
+- [ ] Sem credenciais hardcoded
+- [ ] Sem `System.out.println` (use SLF4J)
+
+---
+
+## 🏗 Arquitetura
+
+### Regras de Dependência (ArchUnit)
+- `domain` **não pode** depender de `application` ou `infrastructure`
+- `application` **não pode** depender de `infrastructure`
+- `infrastructure` **pode** depender de `domain` e `application`
+- `shared` **não pode** depender de nenhum outro pacote
+
+### Adicionando um novo adapter
+1. Crie a interface Port em `application/port/out/`
+2. Implemente em `infrastructure/adapter/out/.../`
+3. Registre como Bean em `infrastructure/config/`
+4. Adicione testes de integração
+
+---
+
+## 🧪 Testes
+
+### Estrutura
+```
+src/test/java/com/qrpro/
+├── architecture/       → ArchUnit tests
+├── domain/            → Testes de lógica pura
+├── application/       → Testes de serviços (mocks)
+└── infrastructure/    → Testes de integração (Testcontainers)
+```
+
+### Rodar testes específicos
+```bash
+./mvnw test -Dtest=ArchitectureTest
+./mvnw verify -Pit
+./mvnw jacoco:report
+```
+
+---
+
+## 📋 Backlog Atual
+
+| # | Item | Status | Dificuldade |
+|---|------|--------|-------------|
+| 1 | Rate limit por plano | 🔄 | Média |
+| 2 | QR com logo | 📋 | Média |
+| 3 | Analytics avançado | 📋 | Alta |
+| 4 | Webhooks de scan | 📋 | Média |
+| 5 | Export CSV/PDF | 📋 | Baixa |
+| 6 | Custom domains | 📋 | Alta |
+
+Quer pegar um item? Comente na issue correspondente!
+
+---
+
+## 💬 Comunicação
+
+- **Issues**: Bugs e features
+- **Discussions**: Dúvidas e ideias gerais
+- **Pull Requests**: Code review
+
+---
+
+## 📜 Código de Conduta
+
+Seja respeitoso, construtivo e inclusivo. Diferenças de opinião são bem-vindas, mas sempre com empatia.
+
+---
+
+**Obrigado por contribuir!** 🙏
