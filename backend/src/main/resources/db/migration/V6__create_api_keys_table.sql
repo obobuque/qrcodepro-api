@@ -8,6 +8,5 @@ CREATE TABLE api_keys (
     active BOOLEAN DEFAULT TRUE,
     UNIQUE(key_hash)
 );
-
 CREATE INDEX idx_api_keys_user_id ON api_keys(user_id);
 CREATE INDEX idx_api_keys_key_hash ON api_keys(key_hash);

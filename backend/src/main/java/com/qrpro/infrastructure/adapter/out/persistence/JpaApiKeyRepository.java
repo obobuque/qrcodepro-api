@@ -1,9 +1,7 @@
 package com.qrpro.infrastructure.adapter.out.persistence;
-
 import com.qrpro.infrastructure.adapter.out.persistence.entity.ApiKeyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 import java.util.UUID;
 
