@@ -33,6 +33,19 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+
+    @ExceptionHandler(com.qrpro.domain.exception.PlanLimitsExceededException.class)
+    public ProblemDetail handlePlanLimitsExceeded(com.qrpro.domain.exception.PlanLimitsExceededException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+        problem.setTitle("Plan Limit Exceeded");
+        problem.setType(URI.create("/upgrade?from=" + ex.getPlanId()));
+        problem.setProperty("timestamp", Instant.now());
+        problem.setProperty("planId", ex.getPlanId());
+        problem.setProperty("limitType", ex.getLimitType());
+        problem.setProperty("upgradeUrl", ex.getUpgradeUrl());
+        return problem;
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGeneric(Exception ex) {
         log.error("Unexpected error: {}", ex.getMessage(), ex);
