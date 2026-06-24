@@ -31,10 +31,10 @@ public class StripeController {
     public ResponseEntity<CheckoutResponse> createCheckout(
             @RequestBody CreateCheckoutRequest request,
             @RequestHeader("Authorization") String authHeader) {
-
+        
         String token = authHeader.replace("Bearer ", "");
         UUID userId = jwtTokenProvider.getUserIdFromToken(token);
-
+        
         CheckoutResponse response = stripeService.createCheckoutSession(userId, request);
         return ResponseEntity.ok(response);
     }
@@ -43,16 +43,21 @@ public class StripeController {
     public ResponseEntity<String> handleWebhook(HttpServletRequest request) {
         String payload = readRequestBody(request);
         String sigHeader = request.getHeader("Stripe-Signature");
-
+        
         try {
             Event event = Webhook.constructEvent(payload, sigHeader, stripeConfig.getWebhookSecret());
-
+            
             log.info("Stripe webhook received: {}", event.getType());
-
+            
             switch (event.getType()) {
                 case "checkout.session.completed" -> {
                     Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
-                    UUID userId = UUID.fromString(session.getClientReferenceId());
+                    String clientRef = session.getClientReferenceId();
+                    UUID userId = (clientRef != null && !clientRef.isEmpty()) ? UUID.fromString(clientRef) : null;
+                    if (userId == null) {
+                        log.warn("No clientReferenceId in session {}", session.getId());
+                        return ResponseEntity.badRequest().body("No clientReferenceId");
+                    }
                     String planId = extractPlanFromSession(session);
                     stripeService.handleSubscriptionCreated(
                         session.getSubscription(),
@@ -68,9 +73,9 @@ public class StripeController {
                     // Handle recurring payment
                 }
             }
-
+            
             return ResponseEntity.ok("Webhook processed");
-
+            
         } catch (Exception e) {
             log.error("Webhook error: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().body("Webhook error: " + e.getMessage());
@@ -91,8 +96,6 @@ public class StripeController {
     }
 
     private String extractPlanFromSession(Session session) {
-        // Extract plan from metadata or line items
-        // For now, return based on amount
         long amount = session.getAmountTotal() != null ? session.getAmountTotal() : 0;
         return switch ((int) amount) {
             case 900 -> "starter";
