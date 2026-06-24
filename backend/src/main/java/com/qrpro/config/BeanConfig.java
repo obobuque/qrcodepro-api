@@ -10,9 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class BeanConfig {
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public QrCodeValidator qrCodeValidator() {
