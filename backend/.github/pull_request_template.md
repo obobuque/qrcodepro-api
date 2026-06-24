@@ -1,9 +1,7 @@
 ## Descrição
+Mudanças neste PR.
 
-Descreva as mudanças neste PR.
-
-## Tipo de Mudança
-
+## Tipo
 - [ ] Bug fix
 - [ ] Nova feature
 - [ ] Breaking change
@@ -12,19 +10,11 @@ Descreva as mudanças neste PR.
 - [ ] Testes
 
 ## Checklist
-
-- [ ] Código compila sem warnings
-- [ ] Todos os testes passam (./mvnw verify)
-- [ ] ArchUnit não quebra
-- [ ] Flyway migrations testadas
+- [ ] Compila sem warnings
+- [ ] Testes passam
+- [ ] ArchUnit OK
 - [ ] Documentação atualizada
 - [ ] Sem credenciais hardcoded
-- [ ] Sem System.out.println
 
-## Issue Relacionada
-
-Fixes #(número da issue)
-
-## Contexto Adicional
-
-Qualquer informação adicional.
+## Issue
+Fixes #

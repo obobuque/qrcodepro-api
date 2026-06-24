@@ -12,22 +12,6 @@
 
 ---
 
-## 📋 Índice
-
-- [Funcionalidades](#-funcionalidades)
-- [Stack Tecnológica](#-stack-tecnológica)
-- [Arquitetura](#-arquitetura)
-- [Endpoints](#-endpoints)
-- [Planos e Preços](#-planos-e-preços)
-- [Instalação](#-instalação)
-- [Configuração](#-configuração)
-- [Uso](#-uso)
-- [Testes](#-testes)
-- [Contribuição](#-contribuição)
-- [Licença](#-licença)
-
----
-
 ## ✨ Funcionalidades
 
 | Feature | Status |
@@ -72,28 +56,10 @@ Arquitetura **Hexagonal (Ports & Adapters)**:
 
 ```
 com.qrpro/
-├── domain/
-│   ├── model/          → User, QrCode, ScanEvent, Plan, Subscription
-│   ├── repository/     → Ports de persistência
-│   ├── service/        → Lógica pura de domínio
-│   └── exception/      → PlanLimitsExceededException
-├── application/
-│   ├── service/        → AuthService, QrCodeService, SubscriptionService
-│   ├── port/in/        → Use Cases
-│   ├── port/out/       → Adapters
-│   ├── dto/            → Request/Response objects
-│   ├── mapper/         → QrCodeMapper
-│   └── event/          → QrCodeGeneratedEvent, QrCodeScannedEvent
-├── infrastructure/
-│   ├── adapter/in/web/       → Controllers REST
-│   ├── adapter/in/scheduler/ → ScanEventBatchProcessor
-│   ├── adapter/out/persistence/ → JPA + Repositories
-│   ├── adapter/out/cache/    → RedisCacheAdapter
-│   ├── adapter/out/messaging/ → RedisScanBufferAdapter
-│   ├── adapter/out/storage/  → LocalStorageAdapter (dev) / S3StorageAdapter (prod/R2)
-│   ├── adapter/out/qr/       → ZxingQrGenerator
-│   └── config/               → SecurityConfig, StripeConfig, etc.
-└── shared/               → Constants, validation
+├── domain/          → User, QrCode, ScanEvent, Plan, Subscription
+├── application/     → Services, Ports, DTOs, Mappers, Events
+├── infrastructure/  → Controllers, Persistence, Cache, Storage, QR Generator
+└── shared/          → Constants, validation
 ```
 
 **Regras ArchUnit:** `domain` não depende de `application` ou `infrastructure`.
@@ -116,37 +82,37 @@ com.qrpro/
 | GET | `/api/v1/qr` | JWT/API Key | Listar QRs |
 | GET | `/api/v1/qr/{id}` | JWT/API Key | Detalhes |
 | GET | `/api/v1/qr/{id}/image` | JWT/API Key | Download PNG |
-| GET | `/api/v1/qr/{id}/scans` | JWT/API Key | Histórico de scans |
-| PUT | `/api/v1/qr/{id}/destination` | JWT/API Key | Editar URL dinâmico |
-| PATCH | `/api/v1/qr/{id}/activate` | JWT/API Key | Ativar QR |
-| PATCH | `/api/v1/qr/{id}/deactivate` | JWT/API Key | Desativar QR |
-| DELETE | `/api/v1/qr/{id}` | JWT/API Key | Deletar QR |
+| GET | `/api/v1/qr/{id}/scans` | JWT/API Key | Histórico |
+| PUT | `/api/v1/qr/{id}/destination` | JWT/API Key | Editar URL |
+| PATCH | `/api/v1/qr/{id}/activate` | JWT/API Key | Ativar |
+| PATCH | `/api/v1/qr/{id}/deactivate` | JWT/API Key | Desativar |
+| DELETE | `/api/v1/qr/{id}` | JWT/API Key | Deletar |
 
 ### Público
 | Método | Endpoint | Auth | Descrição |
 |--------|----------|------|-----------|
-| POST | `/api/v1/public/qr/static` | ❌ | QR público (demo) |
-| GET | `/r/{shortCode}` | ❌ | Redirect 302 (QR dinâmico) |
+| POST | `/api/v1/public/qr/static` | ❌ | QR demo |
+| GET | `/r/{shortCode}` | ❌ | Redirect 302 |
 
 ### API Keys
 | Método | Endpoint | Auth | Descrição |
 |--------|----------|------|-----------|
-| POST | `/api/v1/api-keys` | JWT | Gerar API Key |
+| POST | `/api/v1/api-keys` | JWT | Gerar key |
 | GET | `/api/v1/api-keys` | JWT | Listar keys |
-| DELETE | `/api/v1/api-keys/{id}` | JWT | Revogar key |
+| DELETE | `/api/v1/api-keys/{id}` | JWT | Revogar |
 
 ### Stripe
 | Método | Endpoint | Auth | Descrição |
 |--------|----------|------|-----------|
-| POST | `/api/v1/checkout` | JWT | Criar sessão de checkout |
-| POST | `/api/v1/webhooks/stripe` | Stripe-Signature | Webhooks Stripe |
+| POST | `/api/v1/checkout` | JWT | Checkout |
+| POST | `/api/v1/webhooks/stripe` | Stripe-Sig | Webhooks |
 
 ### Outros
 | Método | Endpoint | Auth | Descrição |
 |--------|----------|------|-----------|
-| GET | `/actuator/health` | ❌ | Health check |
+| GET | `/actuator/health` | ❌ | Health |
 | GET | `/` | ❌ | Frontend demo |
-| GET | `/swagger-ui.html` | ❌ | Documentação interativa (dev) |
+| GET | `/swagger-ui.html` | ❌ | API Docs |
 
 ---
 
@@ -159,159 +125,78 @@ com.qrpro/
 | **Pro** | $29 | 1.000 | 100.000 | ✅ | ✅ | ✅ | ❌ | 300/min |
 | **Business** | $99 | Ilimitado | 1.000.000 | ✅ | ✅ | ✅ | ✅ | 1000/min |
 
-- Todo usuário novo recebe plano **Free** automaticamente
-- Upgrade via Stripe Checkout
-- Limites retornam HTTP **429** com `ProblemDetail` (inclui link para upgrade)
-
 ---
 
 ## 🚀 Instalação
 
-### Pré-requisitos
-- Java 21+
-- Maven 3.9+
-- Docker & Docker Compose (para dev local)
-- Conta Stripe (para pagamentos)
-- Conta Cloudflare R2 (para storage de produção)
-
-### Clone
 ```bash
 git clone https://github.com/obobuque/qrcodepro-api.git
 cd qrcodepro-api
-```
 
-### Dev Local
-```bash
-# Subir PostgreSQL + Redis
+# Dev local
 docker-compose up -d
-
-# Compilar e rodar
 ./mvnw clean spring-boot:run -Dspring-boot.run.profiles=dev
-```
 
-### Produção (Render)
-```bash
+# Produção
 mvn clean package -DskipTests
 java -Dspring.profiles.active=prod -jar target/qrpro-api-1.0.0.jar
 ```
 
 ---
 
-## ⚙️ Configuração
-
-### Variáveis de Ambiente (Produção)
+## ⚙️ Variáveis de Ambiente
 
 ```bash
-# Banco de dados
 SPRING_DATASOURCE_URL=jdbc:postgresql://host:5432/qrpro
 SPRING_DATASOURCE_USERNAME=qrpro
 SPRING_DATASOURCE_PASSWORD=***
-
-# Redis
 SPRING_DATA_REDIS_HOST=***
 SPRING_DATA_REDIS_PORT=6379
-
-# JWT
 JWT_SECRET=***
 JWT_EXPIRATION=86400000
-
-# QR Base URL
 QR_BASE_URL=https://qrcodepro-api.onrender.com
-
-# Cloudflare R2
 R2_ACCESS_KEY_ID=***
 R2_SECRET_ACCESS_KEY=***
 R2_PUBLIC_URL=https://pub-***.r2.dev
-
-# Stripe
 STRIPE_SECRET_KEY=sk_***
 STRIPE_WEBHOOK_SECRET=whsec_***
-
-# Porta
 PORT=10000
 ```
-
-### Stripe Dashboard
-- Webhook URL: `https://qrcodepro-api.onrender.com/api/v1/webhooks/stripe`
-- Eventos: `checkout.session.completed`, `customer.subscription.deleted`, `invoice.paid`
 
 ---
 
 ## 🧪 Testes
 
 ```bash
-# Todos os testes
 ./mvnw test
-
-# Testes de integração (requer Docker)
 ./mvnw verify
-
-# Apenas testes de arquitetura
 ./mvnw test -Dtest=ArchitectureTest
 ```
 
-**Cobertura atual:** 33 testes passando
-- ArchitectureTest (ArchUnit)
-- AuthServiceTest
-- JwtTokenProviderTest
-- QrCodeValidatorTest
-- UserRepositoryAdapterIT
-- AuthControllerIT
+**33 testes passando** — ArchitectureTest, AuthServiceTest, JwtTokenProviderTest, QrCodeValidatorTest, UserRepositoryAdapterIT, AuthControllerIT.
 
 ---
 
-## 📖 Uso
+## 📖 Uso Rápido
 
-### Login e obter token
 ```bash
-TOKEN=$(curl -s -X POST https://qrcodepro-api.onrender.com/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"gabriel","password":"senha123"}' | \
-  python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
-```
+TOKEN=$(curl -s -X POST https://qrcodepro-api.onrender.com/api/v1/auth/login   -H "Content-Type: application/json"   -d '{"username":"gabriel","password":"senha123"}' |   python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
 
-### Criar QR estático
-```bash
-curl -s -X POST -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"content":"https://example.com","size":300}' \
-  https://qrcodepro-api.onrender.com/api/v1/qr/static
-```
-
-### Criar QR dinâmico
-```bash
-curl -s -X POST -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"initialUrl":"https://dinamico.com","size":300}' \
-  https://qrcodepro-api.onrender.com/api/v1/qr/dynamic
-```
-
-### Checkout Stripe
-```bash
-curl -s -X POST -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"planId":"starter","successUrl":"https://...","cancelUrl":"https://..."}' \
-  https://qrcodepro-api.onrender.com/api/v1/checkout
+curl -s -X POST -H "Authorization: Bearer $TOKEN"   -H "Content-Type: application/json"   -d '{"content":"https://example.com","size":300}'   https://qrcodepro-api.onrender.com/api/v1/qr/static
 ```
 
 ---
 
 ## 🤝 Contribuição
 
-Veja [CONTRIBUTING.md](CONTRIBUTING.md) para guias de contribuição.
-
----
+Veja [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 📜 Licença
 
-Distribuído sob licença MIT. Veja [LICENSE](LICENSE) para mais informações.
-
----
+MIT — veja [LICENSE](LICENSE).
 
 ## 👤 Autor
 
 **Gabriel** — [GitHub](https://github.com/obobuque)
 
----
-
-> ⭐ Se este projeto te ajudou, deixe uma star no repositório!
+> ⭐ Deixe uma star se te ajudou!

@@ -1,41 +1,27 @@
 ---
 name: Bug Report
-about: Crie um relatório para nos ajudar a melhorar
+about: Reporte um bug
 title: '[BUG] '
 labels: bug
-assignees: ''
-
 ---
 
-## Descrição do Bug
+## Descrição
+Uma descrição clara do bug.
 
-Uma descrição clara e concisa do bug.
-
-## Como Reproduzir
-
-Passos para reproduzir:
+## Reproduzir
 1. Vá para '...'
 2. Clique em '...'
 3. Veja o erro
 
-## Comportamento Esperado
+## Esperado
+O que deveria acontecer.
 
-O que você esperava que acontecesse.
-
-## Screenshots / Logs
-
+## Logs
 ```
-# Cole logs aqui
+# Cole aqui
 ```
 
 ## Ambiente
-
-- **OS:** [e.g. Ubuntu 22.04]
-- **Java:** [e.g. 21.0.2]
-- **Maven:** [e.g. 3.9.6]
-- **Versão:** [e.g. 1.0.0]
-- **Perfil:** [dev / prod]
-
-## Contexto Adicional
-
-Qualquer outra informação relevante.
+- OS: [e.g. Ubuntu 22.04]
+- Java: [e.g. 21.0.2]
+- Versão: [e.g. 1.0.0]

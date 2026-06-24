@@ -7,7 +7,6 @@ Obrigado pelo interesse em contribuir! 🎉
 ## 🚀 Como Contribuir
 
 ### 1. Reportar Bugs
-
 Use o template [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md). Inclua:
 - Passos para reproduzir
 - Comportamento esperado vs atual
@@ -15,11 +14,7 @@ Use o template [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md). Inclua:
 - Ambiente (Java version, SO, etc.)
 
 ### 2. Sugerir Features
-
-Use o template [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md). Descreva:
-- O problema que a feature resolve
-- Solução proposta
-- Alternativas consideradas
+Use o template [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md).
 
 ### 3. Enviar Pull Requests
 
@@ -34,7 +29,6 @@ cd qrcodepro-api
 feature/qr-com-logo
 fix/rate-limit-planos
 docs/atualizar-readme
-refactor/melhorar-cache
 ```
 
 #### Antes de commitar
@@ -50,35 +44,34 @@ refactor/melhorar-cache
 - **Testes obrigatórios** para novas features
 - **Flyway migrations** para alterações de schema
 - **DTOs** para entrada/saída de controllers
-- **Ports & Adapters** para novas integrações externas
+- **Ports & Adapters** para novas integrações
 
 #### Commit messages (Conventional Commits)
 ```
 feat: adicionar QR com logo
-fix: corrigir rate limit para planos dinâmicos
-docs: atualizar README com novos endpoints
-refactor: migrar storage para R2 SDK v2
-test: adicionar testes para SubscriptionService
+fix: corrigir rate limit
+docs: atualizar README
+refactor: migrar storage
+test: adicionar testes
 ```
 
 #### PR Checklist
 - [ ] Código compila sem warnings
-- [ ] Todos os testes passam (`./mvnw verify`)
+- [ ] Todos os testes passam
 - [ ] ArchUnit não quebra
 - [ ] Flyway migrations testadas
-- [ ] Documentação atualizada (README, API.md, etc.)
+- [ ] Documentação atualizada
 - [ ] Sem credenciais hardcoded
-- [ ] Sem `System.out.println` (use SLF4J)
+- [ ] Sem `System.out.println`
 
 ---
 
 ## 🏗 Arquitetura
 
-### Regras de Dependência (ArchUnit)
+### Regras ArchUnit
 - `domain` **não pode** depender de `application` ou `infrastructure`
 - `application` **não pode** depender de `infrastructure`
 - `infrastructure` **pode** depender de `domain` e `application`
-- `shared` **não pode** depender de nenhum outro pacote
 
 ### Adicionando um novo adapter
 1. Crie a interface Port em `application/port/out/`
@@ -90,16 +83,6 @@ test: adicionar testes para SubscriptionService
 
 ## 🧪 Testes
 
-### Estrutura
-```
-src/test/java/com/qrpro/
-├── architecture/       → ArchUnit tests
-├── domain/            → Testes de lógica pura
-├── application/       → Testes de serviços (mocks)
-└── infrastructure/    → Testes de integração (Testcontainers)
-```
-
-### Rodar testes específicos
 ```bash
 ./mvnw test -Dtest=ArchitectureTest
 ./mvnw verify -Pit
@@ -108,33 +91,27 @@ src/test/java/com/qrpro/
 
 ---
 
-## 📋 Backlog Atual
+## 📋 Backlog
 
-| # | Item | Status | Dificuldade |
-|---|------|--------|-------------|
-| 1 | Rate limit por plano | 🔄 | Média |
-| 2 | QR com logo | 📋 | Média |
-| 3 | Analytics avançado | 📋 | Alta |
-| 4 | Webhooks de scan | 📋 | Média |
-| 5 | Export CSV/PDF | 📋 | Baixa |
-| 6 | Custom domains | 📋 | Alta |
-
-Quer pegar um item? Comente na issue correspondente!
+| # | Item | Status |
+|---|------|--------|
+| 1 | Rate limit por plano | 🔄 |
+| 2 | QR com logo | 📋 |
+| 3 | Analytics avançado | 📋 |
+| 4 | Webhooks de scan | 📋 |
+| 5 | Export CSV/PDF | 📋 |
+| 6 | Custom domains | 📋 |
 
 ---
 
 ## 💬 Comunicação
 
 - **Issues**: Bugs e features
-- **Discussions**: Dúvidas e ideias gerais
+- **Discussions**: Dúvidas e ideias
 - **Pull Requests**: Code review
-
----
 
 ## 📜 Código de Conduta
 
-Seja respeitoso, construtivo e inclusivo. Diferenças de opinião são bem-vindas, mas sempre com empatia.
-
----
+Seja respeitoso, construtivo e inclusivo.
 
 **Obrigado por contribuir!** 🙏
