@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Pro — Gere QR Codes Gratis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --success: #22c55e;
+            --error: #ef4444;
+            --shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .header {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text); }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover { background: var(--bg-card); }
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+        .hero-badges {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .generator {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .color-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .color-input-wrapper input[type="color"] {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: none;
+        }
+        .color-input-wrapper input[type="text"] { flex: 1; }
+        .btn-generate {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            justify-content: center;
+        }
+        .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 2rem;
+            text-align: center;
+            display: none;
+        }
+        .result.show { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .qr-image {
+            max-width: 300px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 1.5rem;
+        }
+        .result-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .result-info {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+        .result-info code {
+            background: var(--bg-input);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        .loading.show { display: block; }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            display: none;
+        }
+        .error.show { display: block; }
+        .features {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+        .features h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .feature-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .cta {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg));
+            border: 1px solid var(--border);
+            border-radius: 20px;
+        }
+        .cta h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .cta p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 2rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .header-inner { padding: 1rem; }
+            .nav-links { display: none; }
+            .card { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <div class="logo-icon">&#9632;</div>
+                QR Pro
+            </a>
+            <nav class="nav-links">
+                <a href="#gerador">Gerador</a>
+                <a href="#features">Features</a>
+                <a href="https://qrcodepro-api.onrender.com/swagger-ui.html" target="_blank">API Docs</a>
+                <a href="https://github.com/obobuque/qrcodepro-api" target="_blank" class="btn btn-outline">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Gere QR Codes<br>Profissionais em Segundos</h1>
+        <p>API SaaS para criacao e rastreamento de QR codes estaticos e dinamicos. Gratis para comecar, poderoso para escalar.</p>
+        <div class="hero-badges">
+            <span class="badge">Sem cadastro para testar</span>
+            <span class="badge">Analytics em tempo real</span>
+            <span class="badge">JWT + API Key</span>
+        </div>
+    </section>
+
+    <section class="generator" id="gerador">
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem; text-align: center;">Gerador de QR Code</h2>
+            <div class="form-group">
+                <label for="content">URL ou texto</label>
+                <input type="text" id="content" placeholder="https://meusite.com" value="https://">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="size">Tamanho (px)</label>
+                    <select id="size">
+                        <option value="200">200px</option>
+                        <option value="300" selected>300px</option>
+                        <option value="400">400px</option>
+                        <option value="500">500px</option>
+                        <option value="600">600px</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="errorCorrection">Correcao de erro</label>
+                    <select id="errorCorrection">
+                        <option value="L">Baixa (7%)</option>
+                        <option value="M" selected>Media (15%)</option>
+                        <option value="Q">Alta (25%)</option>
+                        <option value="H">Maxima (30%)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Cor do QR</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="fgColor" value="#000000">
+                        <input type="text" id="fgColorText" value="#000000" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Cor de fundo</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="bgColor" value="#FFFFFF">
+                        <input type="text" id="bgColorText" value="#FFFFFF" readonly>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-generate" id="generateBtn" onclick="generateQR()">
+                <span id="btnText">Gerar QR Code</span>
+            </button>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Gerando seu QR code...</p>
+            </div>
+            <div class="error" id="error"></div>
+            <div class="result" id="result">
+                <img class="qr-image" id="qrImage" src="" alt="QR Code gerado">
+                <div class="result-actions">
+                    <a id="downloadBtn" class="btn btn-primary" download="qrcode.png">Download PNG</a>
+                    <button class="btn btn-outline" onclick="copyImageUrl()">Copiar URL</button>
+                </div>
+                <div class="result-info">
+                    <p><strong>ID:</strong> <code id="resultId">-</code></p>
+                    <p style="margin-top: 0.5rem;"><strong>URL da imagem:</strong></p>
+                    <code id="resultUrl" style="display: block; margin-top: 0.5rem;">-</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <h2>Por que usar QR Pro?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">&#128202;</div>
+                <h3>Analytics em Tempo Real</h3>
+                <p>Acompanhe scans por periodo, dispositivo, localizacao e mais. Tudo via API ou dashboard.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128260;</div>
+                <h3>QR Dinamico</h3>
+                <p>Mude o destino do QR sem reimprimir. Ideal para campanhas, menus e links que evoluem.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#9889;</div>
+                <h3>API RESTful</h3>
+                <p>Integracao simples com JWT ou API Key. Documentacao OpenAPI/Swagger completa.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#127912;</div>
+                <h3>Personalizacao</h3>
+                <p>Cores, tamanho, correcao de erro. Em breve: logo central e estilos avancados.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128274;</div>
+                <h3>Seguranca</h3>
+                <p>JWT HS512, API Keys com hash SHA-256, rate limiting distribuido com Redis.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#127959;</div>
+                <h3>Arquitetura Hexagonal</h3>
+                <p>Codigo limpo, testavel e desacoplado. Facil de manter e escalar.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <h2>Pronto para integrar?</h2>
+        <p>Comece gratis. Escale conforme seu crescimento. Sem cartao de credito.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="https://qrcodepro-api.onrender.com/swagger-ui.html" class="btn btn-primary" target="_blank">Ver Documentacao da API</a>
+            <a href="https://github.com/obobuque/qrcodepro-api" class="btn btn-outline" target="_blank">Ver no GitHub</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>QR Pro API — Feito com cafe e Java por <a href="https://github.com/obobuque" target="_blank">@obobuque</a></p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+            <a href="https://qrcodepro-api.onrender.com/swagger-ui.html" target="_blank">API Docs</a> •
+            <a href="https://github.com/obobuque/qrcodepro-api" target="_blank">GitHub</a> •
+            <a href="mailto:gblgabriel111@gmail.com">Contato</a>
+        </p>
+    </footer>
+
+    <script>
+        const API_BASE = 'https://qrcodepro-api.onrender.com';
+        document.getElementById('fgColor').addEventListener('input', e => {
+            document.getElementById('fgColorText').value = e.target.value;
+        });
+        document.getElementById('bgColor').addEventListener('input', e => {
+            document.getElementById('bgColorText').value = e.target.value;
+        });
+        async function generateQR() {
+            const content = document.getElementById('content').value.trim();
+            const size = document.getElementById('size').value;
+            const errorCorrection = document.getElementById('errorCorrection').value;
+            const fgColor = document.getElementById('fgColor').value;
+            const bgColor = document.getElementById('bgColor').value;
+            if (!content || content === 'https://') {
+                showError('Digite uma URL ou texto valido');
+                return;
+            }
+            hideError();
+            showLoading(true);
+            hideResult();
+            try {
+                const response = await fetch(API_BASE + '/api/v1/public/qr/static', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: content,
+                        size: parseInt(size),
+                        foregroundColor: fgColor,
+                        backgroundColor: bgColor,
+                        errorCorrectionLevel: errorCorrection
+                    })
+                });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.message || 'Erro ' + response.status);
+                }
+                const data = await response.json();
+                showResult(data);
+            } catch (err) {
+                showError(err.message || 'Erro ao gerar QR code. Tente novamente.');
+            } finally {
+                showLoading(false);
+            }
+        }
+        function showResult(data) {
+            const result = document.getElementById('result');
+            const qrImage = document.getElementById('qrImage');
+            const downloadBtn = document.getElementById('downloadBtn');
+            qrImage.src = data.imageUrl || API_BASE + '/api/v1/qr/' + data.id + '/image';
+            downloadBtn.href = qrImage.src;
+            document.getElementById('resultId').textContent = data.id;
+            document.getElementById('resultUrl').textContent = data.imageUrl || qrImage.src;
+            result.classList.add('show');
+        }
+        function hideResult() {
+            document.getElementById('result').classList.remove('show');
+        }
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('show', show);
+            document.getElementById('generateBtn').disabled = show;
+            document.getElementById('btnText').textContent = show ? 'Gerando...' : 'Gerar QR Code';
+        }
+        function showError(msg) {
+            const el = document.getElementById('error');
+            el.textContent = msg;
+            el.classList.add('show');
+        }
+        function hideError() {
+            document.getElementById('error').classList.remove('show');
+        }
+        async function copyImageUrl() {
+            const url = document.getElementById('resultUrl').textContent;
+            try {
+                await navigator.clipboard.writeText(url);
+                const btn = event.target.closest('button');
+                const original = btn.innerHTML;
+                btn.innerHTML = 'Copiado!';
+                setTimeout(() => btn.innerHTML = original, 2000);
+            } catch {
+                showError('Nao foi possivel copiar. Selecione o texto manualmente.');
+            }
+        }
+        document.getElementById('content').addEventListener('keypress', e => {
+            if (e.key === 'Enter') generateQR();
+        });
+    </script>
+</body>
+</html>
