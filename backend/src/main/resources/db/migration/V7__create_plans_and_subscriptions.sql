@@ -1,4 +1,4 @@
--- Tabela de planos (dados imutáveis, populada via migration)
+-- Tabela de planos
 CREATE TABLE plans (
     id VARCHAR(20) PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE plans (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Tabela de assinaturas dos usuarios
+-- Tabela de assinaturas (sem partial unique constraint)
 CREATE TABLE subscriptions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -24,14 +24,20 @@ CREATE TABLE subscriptions (
     stripe_subscription_id VARCHAR(100),
     stripe_customer_id VARCHAR(100),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    UNIQUE(user_id, active) WHERE active = true
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- Indices
 CREATE INDEX idx_subscriptions_user_id ON subscriptions(user_id);
 CREATE INDEX idx_subscriptions_active ON subscriptions(active);
 CREATE INDEX idx_subscriptions_plan_id ON subscriptions(plan_id);
+
+-- Garantir apenas uma assinatura ativa por usuario (via trigger ou aplicacao)
+-- NOTA: PostgreSQL nao suporta UNIQUE WHERE em constraints, apenas em indices parciais
+-- Vamos usar um indice parcial para isso:
+CREATE UNIQUE INDEX idx_subscriptions_one_active_per_user 
+ON subscriptions(user_id) 
+WHERE active = true;
 
 -- Popular planos padrao
 INSERT INTO plans (id, name, price_cents, max_qr_codes, max_scans_per_month, allows_dynamic, allows_custom_logo, allows_custom_colors, allows_webhooks, api_rate_limit_per_minute) VALUES
