@@ -33,7 +33,8 @@ public class StripeController {
             @RequestHeader("Authorization") String authHeader) {
         
         String token = authHeader.replace("Bearer ", "");
-        UUID userId = jwtTokenProvider.getUserIdFromToken(token);
+        String userIdStr = jwtTokenProvider.getUserIdFromToken(token);
+        UUID userId = UUID.fromString(userIdStr);
         
         CheckoutResponse response = stripeService.createCheckoutSession(userId, request);
         return ResponseEntity.ok(response);
