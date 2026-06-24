@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://qrcodepro-api.onrender.com/swagger-ui.html">Documentacao Swagger</a> •
+  <a href="https://qrcodepro-api.onrender.com/swagger-ui/index.html">Documentacao Swagger</a> •
   <a href="https://qrcodepro-api.onrender.com">Demo</a> •
   <a href="#quick-start">Quick Start</a>
 </p>
@@ -239,7 +239,7 @@ cp .env.example .env
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-Acesse: http://localhost:8080/swagger-ui.html
+Acesse: http://localhost:8080/swagger-ui/index.html
 
 ---
 
